@@ -2,10 +2,15 @@
 
 ## 演習
 
-- 第1回（素のLLM）とエージェントの回答の違い：
-- `--trace` で見えたツール呼び出し（ツール名と引数）：
-- 1つの質問での LLM 呼び出し回数（`requests`）：
+- 第1回（素のLLM）とエージェントの回答の違い：`<fill in after running: uv run python -m app.agent "AIE2026の講座の宿題にある「3レベル」とは何ですか？">` The plain LLM (`app.ask`) doesn't know the course; the agent is expected to search the glossary (`homework-levels`) and end with the related lecture.
+- `--trace` で見えたツール呼び出し（ツール名と引数）：`<paste [tool call] lines from: uv run python -m app.agent --trace "LoRAとQLoRAの違いは？">`
+- 1つの質問での LLM 呼び出し回数（`requests`）：`<value of requests= in the [usage] line>`
 - 追加したツールと、docstring に書いた説明：
+  - `make_quiz(lecture: int) -> str` in `app/tools.py`, registered with `agent.tool_plain(tools.make_quiz)` in `app/agent.py`. I also added "確認問題（復習問題）を求められたら make_quiz を使う" to `INSTRUCTIONS`.
+  - Docstring: picks one term of the given lecture from the glossary and returns a review question and its answer; use it when asked for a review question / quiz such as "第2回の確認問題を出して". Returns `{"question": ..., "answer": ...}` as JSON.
+  - If the lecture has no terms (e.g. `lecture=0`) it returns a message listing the lectures that have terms instead of raising an error.
+  - Verified without an API key: `uv run pytest -q` → 11 passed; `--list-tools` shows `make_quiz` with its docstring; `make_quiz(2)` returned `{"question": "「事前学習」の意味は？", "answer": "大量の汎用テキストで、次のトークンを予測するように…"}`.
+  - With the API: `<paste the [tool call] make_quiz({'lecture': 2}) line from: uv run python -m app.agent --trace "第2回の内容から確認問題を1問出して">`
 
 ## 宿題
 
