@@ -2,15 +2,26 @@
 
 ## 演習
 
-- 第1回（素のLLM）とエージェントの回答の違い：`<fill in after running: uv run python -m app.agent "AIE2026の講座の宿題にある「3レベル」とは何ですか？">` The plain LLM (`app.ask`) doesn't know the course; the agent is expected to search the glossary (`homework-levels`) and end with the related lecture.
-- `--trace` で見えたツール呼び出し（ツール名と引数）：`<paste [tool call] lines from: uv run python -m app.agent --trace "LoRAとQLoRAの違いは？">`
-- 1つの質問での LLM 呼び出し回数（`requests`）：`<value of requests= in the [usage] line>`
+All runs with `gemini-3.5-flash-lite`.
+
+- 第1回（素のLLM）とエージェントの回答の違い：Same question "AIE2026の講座の宿題にある「3レベル」とは何ですか？".
+  - Lecture 1 (`app.ask`, plain LLM): didn't know the course and guessed three generic meanings (difficulty levels, Bloom's taxonomy, must/stretch/geek); none matched, 733 output tokens.
+  - Lecture 3 (`app.agent`): answered correctly and briefly — 基礎（講義内容の確認）/ 実装（自分でコードを書く）/ 発展（調査や試行）, completing any one finishes that lecture's homework, and in principle it isn't graded — which matches `homework-levels` in `data/glossary.json` almost word for word. It ended with "関連する回：第1回", as `INSTRUCTIONS` asks.
+- `--trace` で見えたツール呼び出し（ツール名と引数）：
+  - `--trace "第2回の内容から確認問題を1問出して"`:
+    ```text
+    [tool call]   make_quiz({'lecture': 2})
+    [tool return] make_quiz -> {"question": "「Hugging Face Hub」の意味は？", "answer": "公開されたモデルやデータセットを共有・ダウンロードできるプラットフォーム。…
+    ```
+  - `--trace "LoRAとQLoRAの違いは？"` failed with 503 (model overloaded) when I ran it, so I have no trace for that question.
+- 1つの質問での LLM 呼び出し回数（`requests`）：**2** for the review-question run: `RunUsage(input_tokens=1000, output_tokens=63, requests=2, tool_calls=1)` — one request where the model chose `make_quiz`, and one after the tool result came back to write the answer.
 - 追加したツールと、docstring に書いた説明：
   - `make_quiz(lecture: int) -> str` in `app/tools.py`, registered with `agent.tool_plain(tools.make_quiz)` in `app/agent.py`. I also added "確認問題（復習問題）を求められたら make_quiz を使う" to `INSTRUCTIONS`.
   - Docstring: picks one term of the given lecture from the glossary and returns a review question and its answer; use it when asked for a review question / quiz such as "第2回の確認問題を出して". Returns `{"question": ..., "answer": ...}` as JSON.
   - If the lecture has no terms (e.g. `lecture=0`) it returns a message listing the lectures that have terms instead of raising an error.
   - Verified without an API key: `uv run pytest -q` → 11 passed; `--list-tools` shows `make_quiz` with its docstring; `make_quiz(2)` returned `{"question": "「事前学習」の意味は？", "answer": "大量の汎用テキストで、次のトークンを予測するように…"}`.
-  - With the API: `<paste the [tool call] make_quiz({'lecture': 2}) line from: uv run python -m app.agent --trace "第2回の内容から確認問題を1問出して">`
+  - With the API: the model called `make_quiz({'lecture': 2})` (trace above), so the docstring + INSTRUCTIONS line were enough for it to pick the tool and the right argument.
+  - Observation: the tool returned both the question and the answer, but the agent showed **only the question** ("考えてみてくださいね。答えは「第2回」にあります！") and ended with "関係する回：第2回". This matches the INSTRUCTIONS line "宿題の答えそのものは書かず、考え方のヒントで導く" — the model treated the quiz answer like a homework answer. Good for learning, but the user has no way to check their answer unless they ask again; if I wanted the answer shown on request, I'd need to say so in the docstring or INSTRUCTIONS.
 
 ## 宿題
 
