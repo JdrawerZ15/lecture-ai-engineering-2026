@@ -2,9 +2,11 @@
 
 ## 演習
 
-- 講座に固有の質問（宿題の3レベル）へのモデルの回答（要約でよい）：`<fill in: summary of what app.ask answered>`
-- 用語集の正しい意味と比べて気づいたこと：`<fill in>` (Correct meaning in `data/glossary.json` → `homework-levels`: Basic / Implementation / Advanced, completing any one finishes that lecture's homework.)
-- 表示できたトークン数（入力 / 出力）：Implemented at the `TODO(第1回 演習)` in `app/ask.py`: it prints `[tokens] input=<prompt_token_count>, output=<candidates_token_count>` from `response.usage_metadata`. Values for that question: `<fill in>`
+Run: `uv run python -m app.ask "AIE2026の講座の宿題にある「3レベル」とは何ですか？"` with `gemini-3.5-flash-lite` (8.17 s).
+
+- 講座に固有の質問（宿題の3レベル）へのモデルの回答（要約でよい）：The model said it can't check the AIE2026 curriculum directly and *guessed* three possible meanings of "3 levels": (1) skill/difficulty levels (beginner → intermediate → advanced, e.g. basic prompting → combining tools → API automation), (2) levels based on Bloom's taxonomy (imitate → apply → create), (3) "must / stretch / geek" levels (a required task, an optional challenge, and a hardest task). It ended by suggesting I ask in the course community or check the course guidance.
+- 用語集の正しい意味と比べて気づいたこと：The correct meaning (`data/glossary.json` → `homework-levels`) is Basic (review the lecture), Implementation (write code yourself), Advanced (research and experiments), and **completing any one of them finishes that lecture's homework**. The model's answer is plausible but generic: none of its three guesses matches, and its 3rd guess even implies the opposite rule (level 1 is mandatory for everyone). It was honest that it was guessing, but it still produced a long, confident-looking answer (733 tokens) for something it doesn't know. This is why the agent in Lecture 3 searches the glossary first.
+- 表示できたトークン数（入力 / 出力）：input = 21 / output = 733. Implemented at the `TODO(第1回 演習)` in `app/ask.py`: it prints `[tokens] input=<prompt_token_count>, output=<candidates_token_count>` from `response.usage_metadata`.
 
 ## 宿題 (Homework 01)
 
