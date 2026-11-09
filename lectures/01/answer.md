@@ -1,4 +1,12 @@
-# Homework 01
+# 第1回 解答
+
+## 演習
+
+- 講座に固有の質問（宿題の3レベル）へのモデルの回答（要約でよい）：`<fill in: summary of what app.ask answered>`
+- 用語集の正しい意味と比べて気づいたこと：`<fill in>` (Correct meaning in `data/glossary.json` → `homework-levels`: Basic / Implementation / Advanced, completing any one finishes that lecture's homework.)
+- 表示できたトークン数（入力 / 出力）：Implemented at the `TODO(第1回 演習)` in `app/ask.py`: it prints `[tokens] input=<prompt_token_count>, output=<candidates_token_count>` from `response.usage_metadata`. Values for that question: `<fill in>`
+
+## 宿題 (Homework 01)
 
 ## Selected level
 Advanced
