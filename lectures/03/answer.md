@@ -24,16 +24,11 @@
 
 - 結果：
 
-  **Run in Codespaces**
-  - Model chosen with `/model`: `gemini-3.6-flash`
+  **Run in Codespaces** *(fill in from your own run)*
+  - Model chosen with `/model`: `<e.g. gemini-3.5-flash>`
   - Question asked: `What does search_glossary in app/tools.py do, and what tools does app/agent.py register?`
-  - At startup Pi tried to download `fd` and `ripgrep` from GitHub on its own; both downloads failed (HTTP 504) and Pi kept running without them.
-  - What Pi did (all **without asking for confirmation**, as the slides warn):
-    1. `read app/tools.py` → failed with ENOENT, because I had launched `pi` from `lectures/03/`, and Pi resolves paths from its working directory (the `<cwd>` section of its prompt).
-    2. Recovered by itself: ran `find . -name "*.py"` (no output), `ls -la`, then `find /workspaces/lecture-ai-engineering-2026 -name "tools.py" -o -name "agent.py"`.
-    3. Found the right path and called `read /workspaces/lecture-ai-engineering-2026/app/tools.py`.
-  - Result: it did not reach a final answer. The model first returned **503** (high demand), then **429 RESOURCE_EXHAUSTED**: the free tier allows only **5 requests per minute** for `gemini-3.6-flash`, and every tool step (each read / find / ls) is a separate LLM request, so 4–5 steps used up the minute's quota.
-  - Takeaways: (1) a coding agent explores with many small tool calls, so it hits rate limits much faster than our glossary agent (the exercise example shows `requests=2` for one question); (2) the working directory matters — it's part of Pi's system prompt, and launching from the repo root would have avoided the failed read and three extra commands.
+  - What Pi did: `<e.g. ran bash "ls", read app/tools.py and app/agent.py, then answered>` — it ran commands / read files **without asking for confirmation**, as the slides warn.
+  - Answer quality: `<one line>`
 
   **Pi's system prompt is assembled, not written as one string.** `buildSystemPromptSections()` builds sections and wraps each one in an XML tag. With the default tools (`read`, `bash`, `edit`, `write`) the rendered prompt is roughly:
 
