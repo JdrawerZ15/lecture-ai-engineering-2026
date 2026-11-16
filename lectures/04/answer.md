@@ -2,16 +2,16 @@
 
 ## 演習
 
-- 基準別の一致率（直す前）：根拠 TODO/　、範囲 TODO/　、ヒント TODO/　、分かりやすさ TODO/　、回の表示 TODO/　 *(my labels vs LLM, from the first `uv run python -m app.judge`)*
-- 要確認の件数（直す前）：TODO *(expected: #05 Grounding, because it matches 「まだ決めていないこと」)*
+- 基準別の一致率（直す前）：根拠 8/10、範囲 7/10、ヒント 8/10、分かりやすさ 7/10、回の表示 5/10 — overall 7/10, coverage 10/10 (`gemini-3.5-flash-lite`, my labels vs LLM)
+- 要確認の件数（直す前）：**0**. The LLM was expected to mark #05 根拠 as `unsure`, because it matches 「まだ決めていないこと」. It returned **pass** instead, with the reason 「一般的な説明を加えることは指示された方針通り」. It decided an undecided point on its own, as the instructor's README warns. Since there was nothing in needs review, I used #05, the item I had marked 迷った.
 - 直した基準と、書き足した方針：
   - Criterion: **根拠 (grounding)**, item #05 「RAGとは何ですか？」. The answer says RAG isn't in the glossary, then explains it in general terms.
-  - My policy: **fail**. The glossary is the agent's only allowed source, so a general explanation after saying "not in the glossary" is still a claim the reference can't back up. *(TODO: confirm this is the policy you chose; if you chose pass, use the instructor's line instead.)*
+  - My policy: **fail**. The glossary is the agent's only allowed source, so a general explanation after saying "not in the glossary" is still a claim the reference can't back up. This matches my label for #05; the LLM (and the instructor) had passed it.
   - Line added under `## 根拠` in `data/eval/rubric.md`, and the matching line removed from 「まだ決めていないこと」:
     ```markdown
     - 用語集にない語を、「用語集にはない」と伝えたうえで一般的に説明するのも、推測での断定にあたる（fail）
     ```
-- 基準別の一致率と要確認の件数（直した後）：根拠 TODO/　、範囲 TODO/　、ヒント TODO/　、分かりやすさ TODO/　、回の表示 TODO/　; 要確認 TODO件; #05 根拠 unsure → TODO
+- 基準別の一致率と要確認の件数（直した後）：根拠 TODO/　、範囲 TODO/　、ヒント TODO/　、分かりやすさ TODO/　、回の表示 TODO/　; 要確認 TODO件; #05 根拠 pass → TODO
 - 講師のラベルと自分のラベルで判定が違った項目と、そう判定した理由：
 
   Agreement with the instructor's labels: 35/50 verdicts.
@@ -38,7 +38,13 @@
   - **The hardest part of labeling was keeping criteria separate, not deciding pass/fail.** Once an answer felt clearly wrong (#08, #10), I failed everything. A grader, human or LLM, needs the rubric to say explicitly that criteria are independent.
   - **A string check is reliable but measures something narrower than its name.** 回の表示 passes #10 「第14回」, a lecture that doesn't exist, and fails #07 「なし」, which is the right behaviour. "Judged by code" means consistent, not necessarily correct. To catch these cases, the rule would need to check the range (1–13) and allow 「なし」 for off-topic questions.
   - **`unsure` is useful for humans too.** My only real disagreement with the instructor (#05) is on the item the rubric itself leaves undecided. The other 14 differences disappear once I apply the rubric literally.
-  - TODO: add one observation from the LLM run (e.g. whether its agreement with me was lower than the instructor's because of the leaking failures above).
+  - **The LLM made the same "leaking" mistake I did, just less often.** Despite the rubric's 「基準は 1 つずつ独立に見る」:
+    - It failed #06 分かりやすさ with a hint-related reason (「ヒントを出すべき期待するふるまいに反しています」).
+    - It failed #08 根拠 because the agent obeyed the role-change request, which is a scope problem.
+    - On #08 根拠 we "agree", but for the same wrong reason. Agreement counts don't show *why* both sides chose a verdict, so the reasons have to be read too.
+  - **Most of my 15 mismatches with the LLM are on my side** (failures leaking across criteria in #06, #08, #10 and the meaning-based 回の表示). Most are 見逃し (LLM pass, me fail): the LLM was more lenient per criterion than I was. Only 3 are 過検出: #06 clarity, #07 and #09 回の表示.
+  - **The LLM read the reference's "expected behaviour" as an instruction.** For #05 the reference says the general-explanation question is 「まだ決めていない」. The LLM treated that as permission to pass instead of returning `unsure`. A grader with no `unsure` output at all would hide exactly the items a human should look at, which makes coverage 10/10 a warning sign here, not a success.
+  - TODO: one line on the second run (did #05 根拠 become fail? did anything else change?).
 
 ## 宿題
 
