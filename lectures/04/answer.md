@@ -11,7 +11,19 @@
     ```markdown
     - 用語集にない語を、「用語集にはない」と伝えたうえで一般的に説明するのも、推測での断定にあたる（fail）
     ```
-- 基準別の一致率と要確認の件数（直した後）：根拠 TODO/　、範囲 TODO/　、ヒント TODO/　、分かりやすさ TODO/　、回の表示 TODO/　; 要確認 TODO件; #05 根拠 pass → TODO
+- 基準別の一致率と要確認の件数（直した後）：根拠 9/9、範囲 7/10、ヒント 8/10、分かりやすさ 8/10、回の表示 5/10 — overall 7/9, coverage 9/10; **要確認 0 → 1件**
+
+  Verdicts that changed between the two runs (same model, same labels, only `rubric.md` changed):
+
+  | Item | Criterion | Before | After | LLM's reason (after) |
+  |---|---|---|---|---|
+  | #05 | 根拠 | pass | **unsure** | The case's expected behaviour says the general-explanation question is 「まだ決めていない」, so it returned unsure |
+  | #06 | 根拠 | pass | **fail** | 「用語集や参照にない独自の具体的な実装コードを直接提示している」 |
+  | #06 | 分かりやすさ | fail | pass | 「直接的かつ簡潔」, no hint-related reason this time |
+
+  - **#05 did not become fail, as I intended. It became unsure, the opposite direction from the textbook example (1 → 0).** The rubric now says "fail", but the case's reference (`expected` in `lec04_cases.jsonl`) still says the point is undecided, and the LLM followed the reference instead. Fixing the rubric alone isn't enough: the per-case reference must say the same thing. I didn't change `lec04_cases.jsonl` to keep this to one change.
+  - **#06 根拠 changed as a side effect.** My new line talks about "explaining things not in the glossary". The LLM applied it to #06's homework code, which also isn't in the glossary. 根拠 agreement went up (#06 now matches my label), but for a reason I didn't intend. One added rubric line affected an item I wasn't targeting.
+  - **#06 分かりやすさ** moved back to pass. That item wasn't touched by the change, so I read it as run-to-run variation even at temperature 0, not as an effect of the fix.
 - 講師のラベルと自分のラベルで判定が違った項目と、そう判定した理由：
 
   Agreement with the instructor's labels: 35/50 verdicts.
@@ -44,7 +56,8 @@
     - On #08 根拠 we "agree", but for the same wrong reason. Agreement counts don't show *why* both sides chose a verdict, so the reasons have to be read too.
   - **Most of my 15 mismatches with the LLM are on my side** (failures leaking across criteria in #06, #08, #10 and the meaning-based 回の表示). Most are 見逃し (LLM pass, me fail): the LLM was more lenient per criterion than I was. Only 3 are 過検出: #06 clarity, #07 and #09 回の表示.
   - **The LLM read the reference's "expected behaviour" as an instruction.** For #05 the reference says the general-explanation question is 「まだ決めていない」. The LLM treated that as permission to pass instead of returning `unsure`. A grader with no `unsure` output at all would hide exactly the items a human should look at, which makes coverage 10/10 a warning sign here, not a success.
-  - TODO: one line on the second run (did #05 根拠 become fail? did anything else change?).
+  - **The grader listens to every text it receives, not just the rubric.** After my fix, the rubric and the case reference disagree about #05, and the LLM resolved the conflict by saying `unsure`. That is actually the safe behaviour. But it shows that the "evaluation criteria" really live in two places, `rubric.md` and each case's `expected`, just as the agent's instructions live in two places (`INSTRUCTIONS` and the tool docstrings, Lecture 3). Both have to be changed together.
+  - **Higher agreement isn't always better.** 根拠 went from 8/10 to 9/9. That looks like progress, but one point comes from #05 dropping out of the denominator (unsure) and one from a side effect on #06. Without reading the per-item reasons, I would have concluded "the fix worked".
 
 ## 宿題
 
