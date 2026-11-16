@@ -44,6 +44,5 @@
 ## まだ決めていないこと（当てはまる回答は unsure にする）
 
 
--Explaining a term not found in the glossary in a general way, after stating that it "is not in the glossary," is not considered a definitive/unsupported assertion (pass).
 <!-- STEP 3 では、上の論点について方針を決め、該当する基準の下に 1〜2 行で書き足します。決めた論点は、この欄から消します -->
 
