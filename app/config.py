@@ -22,6 +22,10 @@ RAG_TOP_K = 5
 GRAPH_START_K = 3
 GRAPH_HOPS = 2
 GRAPH_MAX_RESULTS = 10
+# 第5回 宿題（発展）: --hybrid。入口は全文、グラフの近傍は質問との距離で並べ替えて要約だけ返す。
+HYBRID_SEEDS = 3
+HYBRID_HOPS = 2
+HYBRID_PREVIEWS = 7
 EMBEDDING_MODEL = "gemini-embedding-001"
 EMBEDDING_DIMENSIONS = 768
 # 2,048トークンの上限に対し、タスク指定等の分を残す。超過時は切り捨てず停止する。

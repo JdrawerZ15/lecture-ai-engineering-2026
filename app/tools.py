@@ -145,3 +145,34 @@ def search_graph(query: str) -> str:
         return json.dumps({"error": str(e)}, ensure_ascii=False)
     except APIError as e:
         return json.dumps({"error": api_error_message(e.code)}, ensure_ascii=False)
+
+
+# 第5回 宿題（発展）: --hybrid で使う2つのツール
+def search_hybrid(query: str) -> str:
+    """第1〜3回の本講義資料を検索する。入口の上位3ページは全文、関連する候補ページは1行要約で返す。
+
+    queryに調べたい内容を指定する。
+    seeds: 質問に最も近いページ（全文・引用情報つき）。
+    candidates: 入口から前後ページ・共通用語でたどれるページを、質問に近い順に並べたもの。
+    candidates は要約だけなので、根拠に使うなら read_page で全文を読む。
+    """
+    import sqlite3
+    from google.genai.errors import APIError
+    from app.retrieval import search_hybrid as search
+
+    try:
+        return json.dumps(search(query), ensure_ascii=False)
+    except (ValueError, OSError, sqlite3.Error) as e:
+        return json.dumps({"error": str(e)}, ensure_ascii=False)
+    except APIError as e:
+        return json.dumps({"error": api_error_message(e.code)}, ensure_ascii=False)
+
+
+def read_page(page_id: str) -> str:
+    """ページID（例: lec03-main-p040）を指定し、そのページの全文と引用情報を返す。"""
+    from app.retrieval import read_page as read
+
+    try:
+        return json.dumps(read(page_id), ensure_ascii=False)
+    except (ValueError, OSError) as e:
+        return json.dumps({"error": str(e)}, ensure_ascii=False)
